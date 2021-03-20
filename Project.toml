@@ -1,6 +1,6 @@
 name = "BranchTests"
 uuid = "734052d1-fea3-4ffe-af92-b9cc64c3051c"
-version = "0.1.0"
+version = "0.1.1"
 
 [compat]
 julia = "1.0"
