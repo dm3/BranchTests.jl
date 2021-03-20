@@ -141,14 +141,8 @@ function run(f, r :: Run)
         task_local_storage(:__TESTBRANCHRUN__, r)
         n = 0
         while should_run(r) && n <= length(r)
-            try
-                n += 1
-                push!(testsets, f(r))
-            catch ex
-                # TODO: should remember and re-throw after all of the branches
-                # unaffected by a non-@test error have been executed
-                @error ex
-            end
+            n += 1
+            push!(testsets, f(r))
         end
     finally
         task_local_storage(:__TESTBRANCHRUN__, nothing)
@@ -216,8 +210,11 @@ function testbranch_expr(input_expr)
 
             inner = quote
                 Test.@testset BranchTestSet node=:(Tag($$(tag.name), $$(tag.idx))) $(testsetargs...) $name begin
-                    $new_body
-                    $(if is_leaf(node_) quote $done_ = true end end)
+                    try
+                        $new_body
+                    finally
+                        $(if is_leaf(node_) quote $done_ = true end end)
+                    end
                 end
             end
 
@@ -238,10 +235,14 @@ function testbranch_expr(input_expr)
         end
     end
     expr = process(input_expr)
+    tree = BranchTests.Tree(root)
+    testset_name = "Branches - $(root.tag.name)($(length(leaves(tree))))"
     quote
-        $state_ = BranchTests.Tree($root)
-        BranchTests.run(BranchTests.Run($state_)) do $state_
-            $expr
+        $state_ = $tree
+        Test.@testset $testset_name begin
+            BranchTests.run(BranchTests.Run($state_)) do $state_
+                $expr
+            end
         end
     end
 end
