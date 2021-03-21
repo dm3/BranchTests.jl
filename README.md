@@ -33,10 +33,8 @@ end
 Running the above produces:
 
 ```
-Test Summary: | Pass  Total
-Vector        |    3      3
-Test Summary: | Pass  Total
-Vector        |    3      3
+Test Summary:        | Pass  Total
+Branches - Vector(2) |    6      6
 ```
 
 The `"Vector"` test branch has been run two times. Once for every terminating
@@ -72,23 +70,21 @@ end
 Result:
 
 ```
-adds another element: Test Failed at REPL[9]:11
+adds another element: Test Failed at REPL[4]:11
   Expression: length(v) == 1
    Evaluated: 2 == 1
 Stacktrace:
- [1] macro expansion at ./REPL[9]:11 [inlined]
- [2] macro expansion at /projects/BranchTests/src/BranchTests.jl:216 [inlined]
- [3] macro expansion at /usr/share/julia/stdlib/v1.5/Test/src/Test.jl:1115 [inlined]
+ [1] macro expansion at ./REPL[4]:11 [inlined]
+ [2] macro expansion at /projects/BranchTests.jl/src/BranchTests.jl:229 [inlined]
  ...
- [12] (::var"#11#12")(::BranchTests.Run) at /projects/BranchTests/src/BranchTests.jl:216
-Test Summary:            | Pass  Fail  Total
-Vector                   |    2     1      3
-  adds one element       |    1     1      2
-    adds another element |          1      1
-┌ Error: Some tests did not pass: 2 passed, 1 failed, 0 errored, 0 broken.
-└ @ BranchTests /projects/BranchTests/src/BranchTests.jl:148
-Test Summary: | Pass  Total
-Vector        |    3      3
+ [12] (::var"#75#76")(::BranchTests.Run) at /projects/BranchTests.jl/src/BranchTests.jl:228
+Test Summary:              | Pass  Fail  Total
+Branches - Vector(2)       |    5     1      6
+  Vector                   |    2     1      3
+    adds one element       |    1     1      2
+      adds another element |          1      1
+  Vector                   |    3            3
+ERROR: Some tests did not pass: 5 passed, 1 failed, 0 errored, 0 broken.
 ```
 
 Now we see there was a `@test` failure and a Pass result! The fact that the
@@ -122,20 +118,19 @@ end
 Result:
 
 ```
-adds one element: Test Failed at REPL[10]:7
+adds one element: Test Failed at REPL[5]:7
   Expression: length(v) == 2
    Evaluated: 1 == 2
 Stacktrace:
- [1] macro expansion at ./REPL[10]:7 [inlined]
- [2] macro expansion at /projects/BranchTests/src/BranchTests.jl:216 [inlined]
- [3] macro expansion at /usr/share/julia/stdlib/v1.5/Test/src/Test.jl:1115 [inlined]
+ [1] macro expansion at ./REPL[5]:7 [inlined]
+ [2] macro expansion at /projects/BranchTests.jl/src/BranchTests.jl:229 [inlined]
  ...
- [8] (::var"#13#14")(::BranchTests.Run) at /projects/BranchTests/src/BranchTests.jl:216
-Test Summary:      | Pass  Fail  Total
-Vector             |    1     1      2
-  adds one element |          1      1
-┌ Error: Some tests did not pass: 1 passed, 1 failed, 0 errored, 0 broken.
-└ @ BranchTests /projects/BranchTests/src/BranchTests.jl:148
+ [8] (::var"#77#78")(::BranchTests.Run) at /projects/BranchTests.jl/src/BranchTests.jl:228
+Test Summary:        | Pass  Fail  Total
+Branches - Vector(2) |    1     1      2
+  Vector             |    1     1      2
+    adds one element |          1      1
+ERROR: Some tests did not pass: 1 passed, 1 failed, 0 errored, 0 broken.
 ```
 
 We see that both leaves of the `"Vector"` branch test failed to run because the
@@ -180,22 +175,18 @@ end
 will print
 
 ```
-Test Summary: | Pass  Total
-Vector        |    2      2
-Test Summary: | Pass  Total
-Vector        |    2      2
+Test Summary:        | Pass  Total
+Branches - Vector(2) |    4      4
 ```
 
 I'd like to see
 
 ```
-Test Summary:             | Pass  Total
-Vector - adds one element |    2      2
-Test Summary:             | Pass  Total
-Vector - equality         |    2      2
+Test Summary:        | Pass  Total
+Branches - Vector(2) |    4      4
+    adds one element |    1      1
+    equality         |    1      1
 ```
 
-Every root test branch description should be suffixed by the test branch leaf
-which passed.  This can _probably_ be done when the underlying `TestSet` is a
-`Test.DefaultTestSet` by modifying the `description` field before it's printed
-out. It is a hack though, so I'd prefer any better idea!
+or something to the above effect. We should see a line for every test branch
+leaf which passed.
